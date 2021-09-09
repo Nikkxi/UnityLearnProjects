@@ -11,6 +11,8 @@ public class PlayerController : MonoBehaviour
     public float xBounds = 10.0f;
     public float zBounds = 10.0f;
 
+    public bool isGameOver = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -20,26 +22,39 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        keepPlayerInBounds();
-
-        if(Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
+        if(isGameOver == false)
         {
-            transform.Translate(Vector3.forward * Time.deltaTime * movementSpeed);
+            keepPlayerInBounds();
+
+            if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
+            {
+                transform.Translate(Vector3.forward * Time.deltaTime * movementSpeed);
+            }
+
+            if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
+            {
+                transform.Translate(Vector3.back * Time.deltaTime * movementSpeed);
+            }
+
+            if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
+            {
+                transform.Translate(Vector3.left * Time.deltaTime * movementSpeed);
+            }
+
+            if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
+            {
+                transform.Translate(Vector3.right * Time.deltaTime * movementSpeed);
+            }
         }
+    }
 
-        if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy"))
         {
-            transform.Translate(Vector3.back * Time.deltaTime * movementSpeed);
-        }
-
-        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
-        {
-            transform.Translate(Vector3.left * Time.deltaTime * movementSpeed);
-        }
-
-        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
-        {
-            transform.Translate(Vector3.right * Time.deltaTime * movementSpeed);
+            isGameOver = true;
+            collision.gameObject.GetComponent<EnemyController>().movementSpeed = 0;
+            Debug.Log("Game Over!");
         }
     }
 
