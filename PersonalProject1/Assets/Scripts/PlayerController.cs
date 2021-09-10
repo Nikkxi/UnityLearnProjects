@@ -5,46 +5,33 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     private Rigidbody playerRB;
+    private GameManager gameManager;
 
     public float movementSpeed = 5.0f;
+    public float rotationSpeed = 15.0f;
 
     public float xBounds = 10.0f;
     public float zBounds = 10.0f;
-
-    public bool isGameOver = false;
 
     // Start is called before the first frame update
     void Start()
     {
         playerRB = GetComponent<Rigidbody>();
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(isGameOver == false)
+        if(gameManager.isGameActive == true)
         {
             keepPlayerInBounds();
 
-            if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
-            {
-                transform.Translate(Vector3.forward * Time.deltaTime * movementSpeed);
-            }
+            float forwardInput = Input.GetAxis("Vertical");
+            float rotationInput = Input.GetAxis("Horizontal");
 
-            if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
-            {
-                transform.Translate(Vector3.back * Time.deltaTime * movementSpeed);
-            }
-
-            if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
-            {
-                transform.Translate(Vector3.left * Time.deltaTime * movementSpeed);
-            }
-
-            if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
-            {
-                transform.Translate(Vector3.right * Time.deltaTime * movementSpeed);
-            }
+            transform.Translate(Vector3.forward * movementSpeed * forwardInput * Time.deltaTime);
+            transform.Rotate(Vector3.up, rotationInput * rotationSpeed * Time.deltaTime);
         }
     }
 
@@ -52,8 +39,9 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Enemy"))
         {
-            isGameOver = true;
-            collision.gameObject.GetComponent<EnemyController>().movementSpeed = 0;
+            gameManager.GameOver();
+            Destroy(collision.gameObject);
+            //Destroy(gameObject);
             Debug.Log("Game Over!");
         }
     }
